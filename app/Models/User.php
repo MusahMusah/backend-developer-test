@@ -84,5 +84,10 @@ class User extends Authenticatable
             'achievement_id',
         );
     }
+
+    public function unlockedAchievements(): BelongsToMany
+    {
+        return $this->userAchievements();
+    }
 }
 
