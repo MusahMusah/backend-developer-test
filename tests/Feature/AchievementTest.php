@@ -121,4 +121,22 @@ class AchievementTest extends TestCase
         Event::assertNotDispatched(AchievementUnlocked::class);
         $this->assertEquals(0, $user->unlockedAchievements()->count());
     }
+
+    /** @test */
+    public function it_creates_achievement_for_user()
+    {
+        $user = User::factory()->create();
+        $achievement = Achievement::factory()->create();
+
+        // Use ReflectionMethod to invoke the private method
+        $service = new AchievementService();
+        $reflectionMethod = new \ReflectionMethod($service, 'createAchievementForUser');
+        $reflectionMethod->invoke($service, $user, $achievement);
+
+        // Refresh the user model to get the latest relationships
+        $user->refresh();
+
+        $this->assertCount(1, $user->userAchievements);
+        $this->assertTrue($user->userAchievements->contains($achievement));
+    }
 }
