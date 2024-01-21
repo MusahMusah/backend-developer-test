@@ -49,4 +49,22 @@ class AchievementTest extends TestCase
         $this->assertCount(1, $user->unlockedAchievements);
         $this->assertTrue($user->unlockedAchievements->contains($commentAchievement));
     }
+
+    /** @test */
+    public function it_does_not_create_achievement_for_comments_below_required_count(): void
+    {
+        $user = User::factory()->create();
+        $achievementType = AchievementTypeEnum::COMMENT;
+        $requiredCommentCount = 5;
+        // Create comments less than the required count
+        Comment::factory()->count($requiredCommentCount - 1)->create(['user_id' => $user->id]);
+
+        // Mock the event to assert later
+        Event::fake();
+        $service = app(AchievementService::class);
+        $service->unlockAchievement($user, $achievementType);
+
+        Event::assertNotDispatched(AchievementUnlocked::class);
+        $this->assertEquals(0, $user->unlockedAchievements()->count());
+    }
 }
