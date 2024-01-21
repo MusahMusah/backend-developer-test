@@ -5,8 +5,10 @@ namespace Tests\Feature;
 use App\Concerns\Enums\AchievementTypeEnum;
 use App\Events\AchievementUnlocked;
 use App\Listeners\AchievementUnlockedListener;
+use App\Listeners\UnlockAchievementListener;
 use App\Models\Achievement;
 use App\Models\Comment;
+use App\Models\Lesson;
 use App\Models\User;
 use App\Services\AchievementService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -66,5 +68,36 @@ class AchievementTest extends TestCase
 
         Event::assertNotDispatched(AchievementUnlocked::class);
         $this->assertEquals(0, $user->unlockedAchievements()->count());
+    }
+
+    /** @test */
+    public function it_unlocks_achievement_for_lesson_type()
+    {
+        $lessonAchievement = Achievement::factory()->create([
+            'type' => AchievementTypeEnum::LESSON,
+            'count' => 1,
+        ]);
+        $user = User::factory()
+            ->has(Lesson::factory()->count(1))
+            ->create();
+
+        // Mock the event to assert later
+        Event::fake();
+        $service = app(AchievementService::class); // Resolve through the container
+        $service->unlockAchievement($user, AchievementTypeEnum::LESSON);
+        $user->refresh();
+
+        Event::assertDispatched(
+            AchievementUnlocked::class,
+            fn ($event) => ($event->achievement_name === $lessonAchievement->text && $event->user === $user)
+        );
+
+        Event::assertListening(
+            AchievementUnlocked::class,
+            AchievementUnlockedListener::class
+        );
+
+        $this->assertCount(1, $user->unlockedAchievements);
+        $this->assertTrue($user->unlockedAchievements->contains($lessonAchievement));
     }
 }
