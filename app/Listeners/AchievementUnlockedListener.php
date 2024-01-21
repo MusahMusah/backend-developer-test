@@ -7,6 +7,7 @@ use App\Events\BadgeUnlocked;
 use App\Models\Badge;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\Log;
 
 class AchievementUnlockedListener
 {
@@ -25,6 +26,10 @@ class AchievementUnlockedListener
 
         if ($badgeTobeUnlocked) {
             BadgeUnlocked::dispatch($badgeTobeUnlocked->name, $event->user);
+
+            Log::info('Dispatched BadgeUnlocked event', [
+                'badge_name' => $badgeTobeUnlocked->name
+            ]);
         }
     }
 }

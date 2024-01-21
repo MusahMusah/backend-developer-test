@@ -7,6 +7,7 @@ use App\Models\Badge;
 use App\Models\User;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\Log;
 
 class BadgeUnlockedListener
 {
@@ -16,6 +17,11 @@ class BadgeUnlockedListener
     public function handle(BadgeUnlocked $event): void
     {
         $this->createUserBadge($event->user, $event->badge_name);
+
+        Log::info('Assigned User a new badge', [
+            'user_name' => $event->user->name,
+            'badge_name' => $event->badge_name
+        ]);
     }
 
     private function createUserBadge(User $user, string $badgeName): void

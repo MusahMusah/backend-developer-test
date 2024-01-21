@@ -8,6 +8,7 @@ use App\Concerns\Enums\AchievementTypeEnum;
 use App\Events\AchievementUnlocked;
 use App\Models\Achievement;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
 
 class AchievementService
 {
@@ -31,6 +32,10 @@ class AchievementService
                 $this->createAchievementForUser($user, $achievement);
 
                 event(new AchievementUnlocked($achievement->text, $user));
+
+                Log::info('Dispatched AchievementUnlocked event', [
+                    'achievement_name' => $achievement->text
+                ]);
             });
         }
     }
@@ -38,6 +43,8 @@ class AchievementService
     private function createAchievementForUser(User $user, Achievement $achievement): void
     {
         $user->userAchievements()->attach($achievement);
+
+        Log::info('User achievement added');
     }
 }
 
