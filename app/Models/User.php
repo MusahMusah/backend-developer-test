@@ -89,5 +89,13 @@ class User extends Authenticatable
     {
         return $this->userAchievements();
     }
+
+    /**
+     * Check if the user has a specific badge.
+     */
+    public function hasBadge(string $badge): bool
+    {
+        return $this->badge()->whereRelation('badge','name', $badge)->exists();
+    }
 }
 
