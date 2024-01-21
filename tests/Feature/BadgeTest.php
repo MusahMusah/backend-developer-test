@@ -118,4 +118,51 @@ class BadgeTest extends TestCase
         );
         $this->assertNull($user->badge);
     }
+
+    /** @test */
+    public function it_create_badge_for_zero_achievements_when_first_comment_is_written(): void
+    {
+        $user = User::factory()->create();
+        $commentAchievement = Achievement::factory()->create([
+            'type' => AchievementTypeEnum::COMMENT,
+            'count' => 1,
+        ]);
+
+        Comment::factory()->create([
+            'user_id' => $user->id
+        ]);
+
+        Badge::create(['name' => 'Beginner', 'required_achievements' => 0]);
+
+        // Mock the events to assert later
+        Event::fake([
+            AchievementUnlocked::class,
+            BadgeUnlocked::class,
+        ]);
+        $service = app(AchievementService::class);
+        $service->unlockAchievement($user, AchievementTypeEnum::COMMENT);
+        $user->refresh();
+
+        $listener = new AchievementUnlockedListener();
+        $listener->handle(new AchievementUnlocked($user->unlockedAchievements->first()->text, $user));
+
+        Event::assertDispatched(BadgeUnlocked::class, function ($event) use ($user,) {
+            $listener = new BadgeUnlockedListener();
+            $listener->handle(new BadgeUnlocked($event->badge_name, $user));
+            $user->refresh();
+
+            return $event->badge_name === $user->badge->badge->name && $event->user === $user;
+        });
+
+        Event::assertDispatched(AchievementUnlocked::class, function ($event) use ($commentAchievement, $user) {
+            return $event->achievement_name === $commentAchievement->text
+                && $event->user === $user;
+        });
+
+        Event::assertListening(
+            AchievementUnlocked::class,
+            AchievementUnlockedListener::class
+        );
+        $this->assertSame('Beginner', $user->badge->badge->name);
+    }
 }
