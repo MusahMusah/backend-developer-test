@@ -83,7 +83,7 @@ class AchievementTest extends TestCase
 
         // Mock the event to assert later
         Event::fake();
-        $service = app(AchievementService::class); // Resolve through the container
+        $service = app(AchievementService::class);
         $service->unlockAchievement($user, AchievementTypeEnum::LESSON);
         $user->refresh();
 
@@ -99,5 +99,26 @@ class AchievementTest extends TestCase
 
         $this->assertCount(1, $user->unlockedAchievements);
         $this->assertTrue($user->unlockedAchievements->contains($lessonAchievement));
+    }
+
+    /** @test */
+    public function it_does_not_create_achievement_for_lessons_below_required_count(): void
+    {
+        $user = User::factory()
+            ->has(Lesson::factory()->count(1))
+            ->create();
+        $achievementType = AchievementTypeEnum::LESSON;
+        $requiredLessonCount = 5;
+
+        // Create lessons less than the required count
+        Lesson::factory()->count($requiredLessonCount - 1)->create();
+
+        // Mock the event to assert later
+        Event::fake();
+        $service = app(AchievementService::class);
+        $service->unlockAchievement($user, $achievementType);
+
+        Event::assertNotDispatched(AchievementUnlocked::class);
+        $this->assertEquals(0, $user->unlockedAchievements()->count());
     }
 }
