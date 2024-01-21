@@ -165,4 +165,41 @@ class BadgeTest extends TestCase
         );
         $this->assertSame('Beginner', $user->badge->badge->name);
     }
+
+    /** @test */
+    public function it_replaces_existing_user_badge(): void
+    {
+        $beginnerBadge = Badge::create(['name' => 'Beginner', 'required_achievements' => 0]);
+        $intermediateBadge = Badge::create(['name' => 'Intermediate', 'required_achievements' => 4]);
+
+        // Create a user with an existing badge
+        $user = User::factory()->create();
+        $user->badge()->create(['badge_id' => $beginnerBadge->id]);
+
+        // create Achievements
+        $achievements = Achievement::factory()->count(4)->create();
+        $user->userAchievements()->sync($achievements);
+
+        // Mock the event to assert later
+        Event::fake();
+
+        $service = app(AchievementService::class); // Resolve through the container
+        $service->unlockAchievement($user, AchievementTypeEnum::COMMENT);
+
+        $listener = new AchievementUnlockedListener();
+        // Unlock an achievement
+        $listener->handle(new AchievementUnlocked($user->unlockedAchievements->first()->text, $user));
+
+        Event::assertDispatched(BadgeUnlocked::class, function ($event) use ($user, $intermediateBadge) {
+            $listener = new BadgeUnlockedListener();
+            $listener->handle(new BadgeUnlocked($event->badge_name, $user));
+            $user->refresh();
+
+            return $event->badge_name === $intermediateBadge->name && $event->user === $user;
+        });
+
+        Event::assertListening(BadgeUnlocked::class, BadgeUnlockedListener::class);
+        $this->assertCount(4, $user->unlockedAchievements);
+        $this->assertSame(1, $user->badge()->count());
+    }
 }
