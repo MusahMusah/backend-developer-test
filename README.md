@@ -1,66 +1,31 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Back-end Developer Test
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+This is my solution to the provided Scenarios in the assessment
 
-## About Laravel
+## Installation
+### Local installation
+- Installation with composer:
+    - Run `composer install` to install the dependencies.
+    - Create a `.env` file using the [.env.example](/.env.example) file as a template. All the appropriate values has been filled in the `.env.example`, this will enable you to run the application locally without issues.
+    - Run `php artisan key:generate` to generate the application key.
+    - Run `php artisan migrate --seed` to run all migrations and seeders
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## My Solution
+### 1. Achievement Storage and Enum
+   I chose to create a dedicated table to store achievements in the system, differentiating them by a `"type"` column defined as an enum class **(AchievementTypeEnum)**. This design decision allows the achievements to be extendable easily. By using an enum, the system becomes scalable, making it straightforward to add new achievement types in the future. This flexibility ensures that the system can accommodate various types of achievements without major modifications. Additionally, I implemented a seeder to provide a convenient way to seed the database with default achievements related to comments watched and lessons watched, maintaining persistent data.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### 2. Badge Storage
+   Similarly, I created a dedicated table to store all badges provided in the assessment. This approach enhances efficiency and manageability. Storing badges in a separate table makes it easy to manage existing badges and add new ones as needed. The system is designed to be extensible, enabling seamless addition of new badges without complex modifications. I implemented a seeder to populate the database with default badges provided in the assessment, ensuring a consistent starting point for badge data.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 3. Achievement Service
+   I introduced an Achievement Service class to encapsulate the core business logic related to creating achievements for users and dispatching the achievement unlock event. This separation of concerns enhances code organization and maintainability. The Achievement Service class can be reused in various parts of the system, such as in the AchievementUnlockedListener and LessonWatchedListener. This modular approach promotes code reuse and allows for easier unit testing of the service logic.
 
-## Learning Laravel
+## Future Improvements
+### 1. Badges with Levels
+   Extend the badge system to include multiple levels for each badge. Users could progress through different levels based on their achievements, providing a gamified experience and additional motivation for user engagement.
+### 2. User Notifications
+   Implement a notification system to inform users when they unlock a new achievement or badge. This enhances the user experience and keeps users engaged with the achievement system.
+## Testing 🚨
+- Automated testing
+    - Run `php artisan test` to execute the test cases.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
-
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-## Laravel Sponsors
-
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
-
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
