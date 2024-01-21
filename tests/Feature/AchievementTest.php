@@ -5,7 +5,6 @@ namespace Tests\Feature;
 use App\Concerns\Enums\AchievementTypeEnum;
 use App\Events\AchievementUnlocked;
 use App\Listeners\AchievementUnlockedListener;
-use App\Listeners\UnlockAchievementListener;
 use App\Models\Achievement;
 use App\Models\Comment;
 use App\Models\Lesson;

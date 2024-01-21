@@ -13,7 +13,6 @@ use App\Models\Comment;
 use App\Models\User;
 use App\Services\AchievementService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
