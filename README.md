@@ -20,6 +20,9 @@ This is my solution to the provided Scenarios in the assessment
 ### 3. Achievement Service
    I introduced an Achievement Service class to encapsulate the core business logic related to creating achievements for users and dispatching the achievement unlock event. This separation of concerns enhances code organization and maintainability. The Achievement Service class can be reused in various parts of the system, such as in the AchievementUnlockedListener and LessonWatchedListener. This modular approach promotes code reuse and allows for easier unit testing of the service logic.
 
+## Oversight
+  My solution on the lessons was based on the lessons that belongs to a user not lessons watched by a user. The test cases also have this oversight.
+
 ## Future Improvements
 ### 1. Badges with Levels
    Extend the badge system to include multiple levels for each badge. Users could progress through different levels based on their achievements, providing a gamified experience and additional motivation for user engagement.
